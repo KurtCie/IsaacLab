@@ -10,7 +10,6 @@ from typing import Literal
 
 from isaaclab.utils import configclass
 
-from .distillation_cfg import RslRlDistillationAlgorithmCfg, RslRlDistillationStudentTeacherCfg
 from .rnd_cfg import RslRlRndCfg
 from .symmetry_cfg import RslRlSymmetryCfg
 
@@ -63,6 +62,43 @@ class RslRlPpoActorCriticRecurrentCfg(RslRlPpoActorCriticCfg):
 
     rnn_num_layers: int = MISSING
     """The number of RNN layers."""
+
+
+@configclass
+class RslRlPerceptiveActorCriticCfg(RslRlPpoActorCriticCfg):
+    """Configuration for the PPO actor-critic networks with perceptual layers."""
+
+    @configclass
+    class CNNConfig:
+        out_channels: list[int] = MISSING
+        """The number of output channels for the CNN."""
+
+        kernel_size: list[tuple[int, int]] | tuple[int, int] = MISSING
+        """The kernel size for the CNN."""
+
+        stride: list[int] | int = 1
+        """The stride for the CNN."""
+
+        flatten: bool = True
+        """Whether to flatten the output of the CNN."""
+
+        avg_pool: tuple[int, int] | None = None
+        """The average pool for the CNN."""
+
+        batchnorm: bool | list[bool] = False
+        """Whether to use batch normalization for the CNN."""
+
+        max_pool: bool | list[bool] = False
+        """Whether to use max pooling for the CNN."""
+
+    class_name: str = "PerceptiveActorCritic"
+    """The policy class name. Default is PerceptiveActorCritic."""
+
+    actor_cnn_config: list[CNNConfig] | CNNConfig | None = MISSING
+    """The CNN configuration for the actor network."""
+
+    critic_cnn_config: list[CNNConfig] | CNNConfig | None = MISSING
+    """The CNN configuration for the critic network."""
 
 
 ############################
@@ -236,18 +272,4 @@ class RslRlOnPolicyRunnerCfg(RslRlBaseRunnerCfg):
     """The policy configuration."""
 
     algorithm: RslRlPpoAlgorithmCfg = MISSING
-    """The algorithm configuration."""
-
-
-@configclass
-class RslRlDistillationRunnerCfg(RslRlBaseRunnerCfg):
-    """Configuration of the runner for distillation algorithms."""
-
-    class_name: str = "DistillationRunner"
-    """The runner class name. Default is DistillationRunner."""
-
-    policy: RslRlDistillationStudentTeacherCfg = MISSING
-    """The policy configuration."""
-
-    algorithm: RslRlDistillationAlgorithmCfg = MISSING
     """The algorithm configuration."""
